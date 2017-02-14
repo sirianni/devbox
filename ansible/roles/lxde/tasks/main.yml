@@ -1,0 +1,21 @@
+---
+- name: Install lubuntu
+  apt: package={{item}}
+  with_items:
+    - lubuntu-core
+    # Additional packages cherry-picked from http://packages.ubuntu.com/yakkety/lubuntu-desktop
+    - lubuntu-default-session
+    - lxrandr
+    - lxappearance
+    - lxinput
+    - lxpanel-indicator-applet-plugin
+    - lxsession-default-apps
+    - lxsession-logout
+    - lxshortcut
+    - lxtask
+    - dmz-cursor-theme
+    - gnome-system-tools
+    - indicator-application-gtk2
+    - ubuntu-drivers-common
+    - x11-utils
+    - xfce4-notifyd

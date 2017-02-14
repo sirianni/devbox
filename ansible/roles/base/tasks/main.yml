@@ -1,0 +1,62 @@
+---
+- name: Set timezone
+  timezone:
+    name: America/New_York
+- name: Update apt cache if needed
+  apt: update_cache=yes
+- name: Upgrade packages
+  apt: upgrade=dist
+- name: Install terminator
+  apt: package=terminator
+- name: Install zsh
+  apt: package=zsh
+- name: Install git
+  apt: package=git
+- name: Create '{{ username }}' user
+  user:
+    name: "{{ username }}"
+    password: "{{ 'pw' | password_hash('sha512') }}"
+    shell: /bin/zsh
+    groups: adm,admin,sudo,audio,video,dip,plugdev,netdev
+- name: Ensure .ssh directory exists
+  file:
+    dest: /home/{{ username }}/.ssh
+    mode: 0700
+    state: directory
+    owner: "{{ username }}"
+    group: "{{ username }}"
+- name: Copy ssh private key
+  copy:
+    src: ssh/id_rsa
+    dest: /home/{{ username }}/.ssh/id_rsa
+    mode: 0600
+    owner: "{{ username }}"
+    group: "{{ username }}"
+- name: Add authorized keys
+  authorized_key:
+    user: "{{ username }}"
+    key: https://github.com/sirianni.keys
+- name: Git clone dotfiles
+  become: yes
+  become_user: "{{ username }}"
+  git:
+    repo: git@bitbucket.org:sirianni/dotfiles.git
+    dest: /home/{{ username }}/dotfiles
+    accept_hostkey: yes
+- name: Symlink dotfiles
+  become: yes
+  become_user: "{{ username }}"
+  command: /home/{{ username }}/dotfiles/script/bootstrap -f
+- name: Fix sudoers to skip password prompt
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^%ADMIN ALL='
+    line: '%ADMIN ALL=(ALL) NOPASSWD: ALL'
+    validate: 'visudo -cf %s'
+- name: Add localhost to /etc/ansible/hosts
+  lineinfile:
+    dest: /etc/ansible/hosts
+    state: present
+    regexp: '^localhost'
+    line: 'localhost ansible_connection=local'

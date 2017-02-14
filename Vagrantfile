@@ -11,14 +11,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.vm.provider "virtualbox" do |vb|
         # Display the VirtualBox GUI when booting the machine
         vb.gui = true
-
-        # Customize the amount of memory on the VM:
-        vb.memory = "4096"
+        vb.memory = 8192
+        vb.customize ["modifyvm", :id, "--clipboard", "bidirectional"]
     end
 
     # Run Ansible from the Vagrant VM
     config.vm.provision "ansible_local" do |ansible|
-        ansible.playbook = "playbook.yml"
+        ansible.playbook = "ansible/bootstrap.yml"
     end
 
 end

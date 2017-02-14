@@ -1,0 +1,18 @@
+---
+- hosts: all
+  vars:
+    username: sirianni
+  become: yes
+  pre_tasks:
+    - name: Install required roles from ansible galaxy
+      become: yes
+      command: ansible-galaxy install -r {{item}}
+      with_items:
+        - requirements.yml
+      # Broken due to https://github.com/ansible/ansible/issues/17136
+      # with_fileglob:
+      #   - roles/*/requirements.yml
+  roles:
+    - role: geerlingguy.nodejs
+      nodejs_version: 6.x
+    - role: gantsign.visual-studio-code

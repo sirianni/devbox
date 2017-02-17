@@ -19,3 +19,4 @@
     - ubuntu-drivers-common
     - x11-utils
     - xfce4-notifyd
+    - midori # Lightweight web browser
